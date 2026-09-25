@@ -6,10 +6,15 @@ import { randomBytes } from 'node:crypto'
 import { createClient } from '@libsql/client'
 import { CODE_RE, SPOTS_PER_REFERRAL, isValidEmail } from '../src/referrals.js'
 
-const url = process.env.TURSO_DATABASE_URL || process.env.DATABASE_URL || 'file:server/local.db'
+const remoteUrl = process.env.TURSO_DATABASE_URL || process.env.DATABASE_URL
 const authToken = process.env.TURSO_AUTH_TOKEN || process.env.DATABASE_AUTH_TOKEN
 
-const db = createClient({ url, authToken })
+// Never fall back to a throwaway local file on Vercel: signups would vanish.
+if (process.env.VERCEL && !remoteUrl) {
+  throw new Error('TURSO_DATABASE_URL is not set for this Vercel environment.')
+}
+
+const db = createClient({ url: remoteUrl || 'file:server/local.db', authToken })
 
 let ready
 function migrate() {
