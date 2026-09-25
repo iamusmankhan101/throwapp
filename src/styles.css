@@ -14,6 +14,7 @@
   --display: 'Inter Tight', 'Inter', system-ui, sans-serif;
   --sans: 'Inter', system-ui, -apple-system, sans-serif;
   --script: 'Caveat', 'Bradley Hand', cursive;
+  --brand: 'Outfit', 'Inter Tight', system-ui, sans-serif;
 
   /* Plane icon tokens */
   --paper: #ffffff;
@@ -63,10 +64,7 @@ button { font: inherit; color: inherit; }
   background: rgba(255, 255, 255, 0.72); backdrop-filter: blur(14px) saturate(1.4);
   border-bottom: 1px solid rgba(228, 237, 239, 0.7);
 }
-.logo { display: inline-flex; align-items: center; gap: 10px; font-family: var(--display); font-weight: 600; font-size: 1.25rem; letter-spacing: -0.02em; text-decoration: none; color: var(--accent); }
-.logo-orb { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: linear-gradient(135deg, var(--accent-2), var(--accent)); }
-.logo-orb svg { width: 18px; height: 18px; }
-.logo-orb svg path { stroke: none; }
+.logo { justify-self: start; font-family: var(--brand); font-weight: 600; font-size: 1.7rem; line-height: 1; letter-spacing: -0.05em; text-decoration: none; color: var(--accent); }
 .nav-links { display: flex; gap: 4px; padding: 4px; border-radius: 999px; background: var(--bg-soft); border: 1px solid var(--line); }
 .nav-links a { text-decoration: none; font-size: 0.88rem; color: var(--text-soft); padding: 7px 14px; border-radius: 999px; transition: background 0.2s, color 0.2s; }
 .nav-links a:hover { color: var(--text); }
@@ -439,7 +437,7 @@ button { font: inherit; color: inherit; }
 .footer-cols a:hover { color: var(--accent); }
 .footer-bottom { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-top: 48px; font-size: 0.82rem; color: var(--muted); }
 .footer-word {
-  font-family: var(--display); font-weight: 500; letter-spacing: -0.06em; line-height: 0.8;
+  font-family: var(--brand); font-weight: 600; letter-spacing: -0.06em; line-height: 0.8;
   font-size: clamp(7rem, 28vw, 22rem); text-align: center; margin-top: 24px;
   background: linear-gradient(180deg, #d3e7ea, rgba(255, 255, 255, 0)); -webkit-background-clip: text; background-clip: text; color: transparent;
   user-select: none;

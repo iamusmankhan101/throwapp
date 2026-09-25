@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { Circle, FAQ, FinalCTA, Hero, HowItWorks, Testimonials, WhyThrow } from './components/Sections.jsx'
-import { PlaneIcon } from './components/Icons.jsx'
 import Rewards from './components/Rewards.jsx'
 import { captureReferral, forgetMember, refreshMember, savedMember } from './waitlist.js'
 
@@ -15,10 +14,7 @@ const NAV = [
 
 function Logo() {
   return (
-    <a href="#top" className="logo" aria-label="Throw home">
-      <span className="logo-orb"><PlaneIcon /></span>
-      <span>Throw</span>
-    </a>
+    <a href="#top" className="logo" aria-label="Throw home">throw</a>
   )
 }
 
@@ -111,7 +107,7 @@ export default function App() {
           <Logo />
           <span>© {new Date().getFullYear()} Throw. Made for the people worth writing to.</span>
         </div>
-        <div className="footer-word" aria-hidden="true">Throw</div>
+        <div className="footer-word" aria-hidden="true">throw</div>
       </footer>
     </div>
   )
