@@ -12,11 +12,14 @@ npm run build    # production build in dist/
 
 ## Deploying (Vercel + Turso)
 
-Pushing to `main` deploys to Vercel. The API needs two environment variables in Vercel, which the Turso
-integration sets for you:
+Pushing to `main` deploys to Vercel. Set these in Vercel → Settings → Environment Variables (Production):
 
-- `TURSO_DATABASE_URL`
-- `TURSO_AUTH_TOKEN`
+- `THROW_DATABASE_URL`: your Turso database URL (`libsql://…`)
+- `THROW_DATABASE_TOKEN`: its auth token
+
+Use these names, not `TURSO_*`: the Vercel Turso integration injects its own `TURSO_*` values per
+deployment (a fresh, empty `dpl-…` database each deploy). `GET /api/health` shows which database host the
+live site is connected to.
 
 The `members` table is created automatically on the first request, so no migration step is needed.
 

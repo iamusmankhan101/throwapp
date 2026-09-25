@@ -21,8 +21,11 @@ const MIN_FILL_MS = 1500
 const MAX_SIGNUPS_PER_IP_PER_DAY = 5
 const RESEND_AFTER_MINUTES = 10
 
-const remoteUrl = process.env.TURSO_DATABASE_URL || process.env.DATABASE_URL
-const authToken = process.env.TURSO_AUTH_TOKEN || process.env.DATABASE_AUTH_TOKEN
+// THROW_DATABASE_* come first: the Vercel Turso integration injects its own
+// TURSO_* values per deployment (a fresh "dpl-..." database each deploy), which
+// would silently start every deployment with an empty waitlist.
+const remoteUrl = process.env.THROW_DATABASE_URL || process.env.TURSO_DATABASE_URL || process.env.DATABASE_URL
+const authToken = process.env.THROW_DATABASE_TOKEN || process.env.TURSO_AUTH_TOKEN || process.env.DATABASE_AUTH_TOKEN
 
 // Never fall back to a throwaway local file on Vercel: signups would vanish.
 if (process.env.VERCEL && !remoteUrl) {
