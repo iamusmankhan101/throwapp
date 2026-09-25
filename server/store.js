@@ -248,3 +248,48 @@ export async function verify(token) {
   await credit(Number(rows[0].id))
   return true
 }
+
+// Everything the admin dashboard shows. Emails are personal data: only call
+// this behind the admin password check (server/admin.js).
+export async function adminOverview({ limit = 5000 } = {}) {
+  await migrate()
+  const [stats, members] = await db.batch(
+    [
+      `SELECT COUNT(*) AS total,
+              COALESCE(SUM(verified), 0) AS verified,
+              COALESCE(SUM(credited), 0) AS credited,
+              COALESCE(SUM(referred_by IS NOT NULL), 0) AS referred,
+              COALESCE(SUM(created_at > datetime('now', '-1 day')), 0) AS last24h
+       FROM members`,
+      {
+        sql: `SELECT id, email, code, referrals, referred_by, verified, credited, source, created_at,
+                     ROW_NUMBER() OVER (ORDER BY ${SCORE('members')}, id) AS position
+              FROM members ORDER BY id DESC LIMIT ?`,
+        args: [limit],
+      },
+    ],
+    'read',
+  )
+  const s = stats.rows[0]
+  return {
+    stats: {
+      total: Number(s.total),
+      verified: Number(s.verified),
+      credited: Number(s.credited),
+      referred: Number(s.referred),
+      last24h: Number(s.last24h),
+    },
+    members: members.rows.map((r) => ({
+      id: Number(r.id),
+      email: r.email,
+      code: r.code,
+      referrals: Number(r.referrals),
+      referredBy: r.referred_by,
+      verified: Boolean(r.verified),
+      credited: Boolean(r.credited),
+      source: r.source,
+      joinedAt: r.created_at,
+      position: Number(r.position),
+    })),
+  }
+}

@@ -4,12 +4,14 @@
 //   POST /api/join          { email, source?, ref? } -> member
 //   GET  /api/status/:code                           -> member
 //   GET  /api/verify?token=...                       -> redirect to the site
+//   GET  /api/admin/members  (Bearer ADMIN_PASSWORD)  -> admin overview
 //
 // member = { code, referrals, position, total }
 
 import http from 'node:http'
 import { siteUrl } from './email.js'
-import { HttpError, join, status, verify } from './store.js'
+import { requireAdmin } from './admin.js'
+import { HttpError, adminOverview, join, status, verify } from './store.js'
 
 const PORT = Number(process.env.PORT) || 8787
 const MAX_BODY = 10_000
@@ -46,6 +48,10 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'POST' && pathname === '/api/join') {
       const { created, member } = await join(await readJson(req), { ip: req.socket.remoteAddress })
       return send(res, created ? 201 : 200, member)
+    }
+    if (req.method === 'GET' && pathname === '/api/admin/members') {
+      await requireAdmin(req.headers.authorization)
+      return send(res, 200, await adminOverview())
     }
     if (req.method === 'GET' && pathname === '/api/verify') {
       const ok = await verify(searchParams.get('token'))

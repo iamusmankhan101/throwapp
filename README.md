@@ -47,10 +47,19 @@ Guard rails built in: emails are normalized and unique, only brand-new signups c
 | POST   | `/api/join`         | `{ email, elapsed, source?, ref?, website? }` | `{ code, referrals, position, total, verified }` |
 | GET    | `/api/status/:code` | none                        | `{ code, referrals, position, total, verified }` |
 | GET    | `/api/verify?token=` | none                       | redirects to `/?verified=1` or `0`      |
+| GET    | `/api/admin/members` | `Authorization: Bearer <ADMIN_PASSWORD>` | stats + all members |
 
-## Viewing signups
+## Admin dashboard
 
-Open your database in the Turso dashboard (or `turso db shell <name>`) and query the `members` table:
+`/admin` shows every signup: totals, confirmed emails, referral stats, top referrers, and a searchable,
+sortable member table with CSV export.
+
+1. In Vercel → Settings → Environment Variables, add `ADMIN_PASSWORD` (long and unique), then redeploy.
+2. Open `https://your-site/admin` and sign in. The password is remembered until you close the tab.
+
+Locally: `ADMIN_PASSWORD=something npm run server`, then open http://localhost:5173/admin.html.
+
+You can also query the database directly in the Turso dashboard:
 
 ```sql
 SELECT email, code, referrals, referred_by, verified, credited, source, created_at FROM members ORDER BY id;
@@ -84,6 +93,8 @@ The limits (`MIN_FILL_MS`, `MAX_SIGNUPS_PER_IP_PER_DAY`) are at the top of `serv
 - `src/referrals.js` — tiers and referral rules (shared with the API)
 - `api/` — Vercel functions: `join.js`, `status/[code].js`, `verify.js`
 - `server/store.js` — database logic and anti-abuse rules (Turso), used by the functions and the local server
+- `src/admin/` + `admin.html` — admin dashboard
+- `server/admin.js` — admin password check
 - `server/email.js` — confirmation/welcome email (Resend)
 - `server/disposable.js` — blocked throwaway email domains
 - `server/index.js` — local dev server
