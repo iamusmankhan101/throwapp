@@ -58,7 +58,7 @@ function Dashboard({ member }) {
   return (
     <div className="dash">
       {member.demo && (
-        <p className="demo-note">Demo mode: set <code>VITE_API_URL</code> to track real invites and places in line.</p>
+        <p className="demo-note">Demo mode: remove <code>VITE_API_URL=demo</code> to track real invites and places in line.</p>
       )}
       <div className="dash-stats">
         <div>

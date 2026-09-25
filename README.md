@@ -1,14 +1,24 @@
 # Throw — landing page
 
-Waitlist landing page for Throw with a referral tier system. React + Vite front end, plus a tiny
-dependency-free Node server that stores signups and counts referrals.
+Waitlist landing page for Throw with a referral tier system. React + Vite front end, API as Vercel
+functions (`api/`), data in Turso (libSQL).
 
 ```bash
 npm install
-npm run server   # referral API on http://localhost:8787 (terminal 1)
+npm run server   # API on http://localhost:8787, using a local SQLite file (terminal 1)
 npm run dev      # site on http://localhost:5173, proxies /api to the server (terminal 2)
 npm run build    # production build in dist/
 ```
+
+## Deploying (Vercel + Turso)
+
+Pushing to `main` deploys to Vercel. The API needs two environment variables in Vercel, which the Turso
+integration sets for you:
+
+- `TURSO_DATABASE_URL`
+- `TURSO_AUTH_TOKEN`
+
+The `members` table is created automatically on the first request, so no migration step is needed.
 
 ## How referrals work
 
@@ -26,29 +36,30 @@ Guard rails built in: emails are normalized and unique, only brand-new signups c
 
 ## Configuration
 
-`.env` (copy from `.env.example`):
-
-- `VITE_API_URL` — where the site calls the API. `/api` locally; your deployed server's URL in production.
-  Leave it empty for demo mode (signups succeed in the browser but nothing is stored).
-
-Server environment variables:
-
-- `PORT` (default `8787`), `DATA_FILE` (default `server/data.json`), `CORS_ORIGIN` (default `*` — set this to
-  your site's origin in production).
+- `TURSO_DATABASE_URL` / `TURSO_AUTH_TOKEN`: the database. Unset locally, the API uses `server/local.db`.
+  Set them in `.env` and run `node --env-file=.env server/index.js` to develop against the real database.
+- `VITE_API_URL`: where the site calls the API (default `/api`). Set it to `demo` to run the site with no API.
 
 ## API
 
 | Method | Path                | Body                        | Returns                                 |
 | ------ | ------------------- | --------------------------- | --------------------------------------- |
 | POST   | `/api/join`         | `{ email, source?, ref? }`  | `{ code, referrals, position, total }`  |
-| GET    | `/api/status/:code` | —                           | `{ code, referrals, position, total }`  |
+| GET    | `/api/status/:code` | none                        | `{ code, referrals, position, total }`  |
 
-## Before going to production
+## Viewing signups
 
-- Deploy `server/` somewhere with a persistent disk (Render, Railway, Fly.io, a VPS) or swap the JSON file for
-  a database. `server/data.json` holds every signup's email — keep it out of git (it's already ignored).
-- Consider email verification before crediting a referral, plus rate limiting, to stop fake-signup farming.
-- Exporting to Loops/ConvertKit for welcome emails: read `server/data.json`, or add a call in `join()`.
+Open your database in the Turso dashboard (or `turso db shell <name>`) and query the `members` table:
+
+```sql
+SELECT email, code, referrals, referred_by, source, created_at FROM members ORDER BY id;
+```
+
+## Before promoting it widely
+
+- Add email verification before crediting a referral, plus rate limiting, to stop fake-signup farming.
+- Send new members a welcome email with their invite link (e.g. Loops or ConvertKit, called from `join()`
+  in `server/store.js`).
 
 ## Where things live
 
@@ -57,6 +68,8 @@ Server environment variables:
 - `src/components/Rewards.jsx` — referral dashboard and tier cards
 - `src/components/PhoneFlight.jsx` — the phone in the hero (write → fold → fly → deliver)
 - `src/waitlist.js` — API client, invite-link capture
-- `src/referrals.js` — tiers and referral rules (shared with the server)
-- `server/index.js` — referral API
+- `src/referrals.js` — tiers and referral rules (shared with the API)
+- `api/` — Vercel functions: `join.js`, `status/[code].js`
+- `server/store.js` — database logic (Turso), used by the functions and the local server
+- `server/index.js` — local dev server
 - `src/styles.css` — all styling; colors are CSS variables at the top

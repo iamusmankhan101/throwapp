@@ -2,10 +2,11 @@ import { CODE_RE, isValidEmail } from './referrals.js'
 
 export { isValidEmail }
 
-// Base URL of the referral API (see server/index.js). Unset = demo mode:
+// Base URL of the referral API: /api by default (Vercel functions in production,
+// the Vite proxy to server/index.js in dev). Set VITE_API_URL=demo for demo mode:
 // signups succeed locally but nothing is stored or counted.
-const API = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '')
-export const DEMO = !API
+const API = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '')
+export const DEMO = API === 'demo'
 
 const MEMBER_KEY = 'throw.member'
 const REF_KEY = 'throw.ref'
