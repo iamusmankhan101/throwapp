@@ -303,5 +303,7 @@ export async function health() {
   await migrate()
   const { rows } = await db.execute('SELECT COUNT(*) AS n FROM members')
   const host = remoteUrl ? new URL(remoteUrl.replace(/^libsql:/, 'https:')).host : 'local file'
-  return { ok: true, database: host, members: Number(rows[0].n) }
+  // Names only, never values: which database variables this deployment can see.
+  const vars = Object.keys(process.env).filter((k) => /DATABASE|TURSO|LIBSQL/i.test(k)).sort()
+  return { ok: true, database: host, members: Number(rows[0].n), vars }
 }
