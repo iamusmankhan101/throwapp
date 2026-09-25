@@ -293,3 +293,12 @@ export async function adminOverview({ limit = 5000 } = {}) {
     })),
   }
 }
+
+// Which database this deployment talks to (host only, never the token), for
+// debugging environment variables.
+export async function health() {
+  await migrate()
+  const { rows } = await db.execute('SELECT COUNT(*) AS n FROM members')
+  const host = remoteUrl ? new URL(remoteUrl.replace(/^libsql:/, 'https:')).host : 'local file'
+  return { ok: true, database: host, members: Number(rows[0].n) }
+}

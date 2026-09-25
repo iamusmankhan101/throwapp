@@ -11,7 +11,7 @@
 import http from 'node:http'
 import { siteUrl } from './email.js'
 import { requireAdmin } from './admin.js'
-import { HttpError, adminOverview, join, status, verify } from './store.js'
+import { HttpError, adminOverview, health, join, status, verify } from './store.js'
 
 const PORT = Number(process.env.PORT) || 8787
 const MAX_BODY = 10_000
@@ -49,6 +49,7 @@ const server = http.createServer(async (req, res) => {
       const { created, member } = await join(await readJson(req), { ip: req.socket.remoteAddress })
       return send(res, created ? 201 : 200, member)
     }
+    if (req.method === 'GET' && pathname === '/api/health') return send(res, 200, await health())
     if (req.method === 'GET' && pathname === '/api/admin/members') {
       await requireAdmin(req.headers.authorization)
       return send(res, 200, await adminOverview())
