@@ -274,6 +274,7 @@ const CIRCLE = [
   { name: 'Aiko', city: 'Tokyo', color: '#f06292', x: 83, y: 20 },
   { name: 'Sam', city: 'Sydney', color: '#4db6ac', x: 92, y: 60 },
   { name: 'Ravi', city: 'Mumbai', color: '#64b5f6', x: 70, y: 86 },
+  { name: 'Zara', city: 'Lahore', color: '#ba68c8', x: 50, y: 11 },
 ]
 
 export function Circle() {
