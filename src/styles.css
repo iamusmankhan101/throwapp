@@ -379,6 +379,7 @@ button { font: inherit; color: inherit; }
 .dash-label { font-size: 0.8rem; color: var(--muted); }
 .dash-stats strong { font-family: var(--display); font-weight: 500; font-size: 2.1rem; letter-spacing: -0.04em; line-height: 1.15; color: var(--accent); font-variant-numeric: tabular-nums; }
 .dash-stats strong.dash-next { font-size: 1.4rem; line-height: 1.5; color: var(--text); letter-spacing: -0.02em; }
+.founding { align-self: flex-start; margin-top: 4px; font-size: 0.75rem; font-weight: 600; color: var(--accent); background: #fff; border: 1px solid var(--lav-2); padding: 3px 10px; border-radius: 999px; }
 .dash-sub { font-size: 0.8rem; color: var(--text-soft); }
 
 .track { position: relative; height: 8px; margin: 34px 12px 42px; border-radius: 999px; background: var(--lav); }

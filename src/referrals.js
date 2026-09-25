@@ -11,6 +11,11 @@ export const TIERS = [
   { count: 10, id: 'founder', name: 'Founding Member', reward: 'A Founding Member badge on your map, forever.' },
 ]
 
+// The waitlist total is only shown once it's big enough to impress; until then
+// early members see a Founding badge instead of "of 3 people".
+export const SHOW_TOTAL_FROM = 100
+export const FOUNDING_SPOTS = 100
+
 export const CODE_RE = /^[a-z0-9]{6,12}$/i
 
 export const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)

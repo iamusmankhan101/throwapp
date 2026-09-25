@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import Reveal from './Reveal.jsx'
 import { PlaneIcon } from './Icons.jsx'
-import { SPOTS_PER_REFERRAL, TIERS, tierProgress } from '../referrals.js'
+import { FOUNDING_SPOTS, SHOW_TOTAL_FROM, SPOTS_PER_REFERRAL, TIERS, tierProgress } from '../referrals.js'
 import { referralLink } from '../waitlist.js'
 
 const MAX = TIERS.at(-1).count
@@ -69,7 +69,11 @@ function Dashboard({ member }) {
         <div>
           <span className="dash-label">Your place in line</span>
           <strong>{member.position ? `#${fmt(member.position)}` : '—'}</strong>
-          {member.total ? <span className="dash-sub">of {fmt(member.total)} people</span> : null}
+          {member.total >= SHOW_TOTAL_FROM ? (
+            <span className="dash-sub">of {fmt(member.total)} people</span>
+          ) : member.position && member.position <= FOUNDING_SPOTS ? (
+            <span className="founding">Founding {FOUNDING_SPOTS} · early member</span>
+          ) : null}
         </div>
         <div>
           <span className="dash-label">Friends joined</span>
