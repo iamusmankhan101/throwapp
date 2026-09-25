@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Circle, FAQ, FinalCTA, Hero, HowItWorks, Testimonials, WhyThrow } from './components/Sections.jsx'
 import Rewards from './components/Rewards.jsx'
-import { captureReferral, forgetMember, refreshMember, savedMember } from './waitlist.js'
+import { captureReferral, captureVerified, forgetMember, refreshMember, savedMember } from './waitlist.js'
 
 const NAV = [
   ['#top', 'Home'],
@@ -38,6 +38,7 @@ function useActiveSection(ids) {
 export default function App() {
   const [member, setMember] = useState(savedMember)
   const [invited] = useState(captureReferral)
+  const [verified, setVerified] = useState(captureVerified)
 
   // Keep referral counts fresh: on load, and whenever the visitor comes back to
   // the tab (e.g. after sharing their link).
@@ -61,6 +62,16 @@ export default function App() {
 
   return (
     <div className="page">
+      {verified !== null && (
+        <div className={`toast ${verified ? '' : 'is-error'}`} role="status">
+          <span>
+            {verified
+              ? 'Email confirmed. Your spot is locked in ✓'
+              : 'That confirmation link has expired or was already used.'}
+          </span>
+          <button type="button" aria-label="Dismiss" onClick={() => setVerified(null)}>×</button>
+        </div>
+      )}
       <header className="nav">
         <Logo />
         <nav className="nav-links" aria-label="Sections">

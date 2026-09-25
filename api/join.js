@@ -7,7 +7,8 @@ export default async function handler(req, res) {
   }
   try {
     const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body ?? {}
-    const { created, member } = await join(body)
+    const ip = req.headers['x-real-ip'] || String(req.headers['x-forwarded-for'] ?? '').split(',')[0].trim()
+    const { created, member } = await join(body, { ip })
     res.status(created ? 201 : 200).json(member)
   } catch (err) {
     if (!(err instanceof HttpError)) console.error(err)

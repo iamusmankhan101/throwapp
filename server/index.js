@@ -3,11 +3,13 @@
 //
 //   POST /api/join          { email, source?, ref? } -> member
 //   GET  /api/status/:code                           -> member
+//   GET  /api/verify?token=...                       -> redirect to the site
 //
 // member = { code, referrals, position, total }
 
 import http from 'node:http'
-import { HttpError, join, status } from './store.js'
+import { siteUrl } from './email.js'
+import { HttpError, join, status, verify } from './store.js'
 
 const PORT = Number(process.env.PORT) || 8787
 const MAX_BODY = 10_000
@@ -39,11 +41,16 @@ function readJson(req) {
 }
 
 const server = http.createServer(async (req, res) => {
-  const { pathname } = new URL(req.url, 'http://localhost')
+  const { pathname, searchParams } = new URL(req.url, 'http://localhost')
   try {
     if (req.method === 'POST' && pathname === '/api/join') {
-      const { created, member } = await join(await readJson(req))
+      const { created, member } = await join(await readJson(req), { ip: req.socket.remoteAddress })
       return send(res, created ? 201 : 200, member)
+    }
+    if (req.method === 'GET' && pathname === '/api/verify') {
+      const ok = await verify(searchParams.get('token'))
+      res.writeHead(302, { Location: `${siteUrl()}/?verified=${ok ? 1 : 0}` })
+      return res.end()
     }
     const match = pathname.match(/^\/api\/status\/([^/]+)$/)
     if (req.method === 'GET' && match) return send(res, 200, await status(decodeURIComponent(match[1])))

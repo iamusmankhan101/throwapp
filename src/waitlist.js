@@ -43,6 +43,17 @@ export function captureReferral() {
 export const referralLink = (code) => `${window.location.origin}${window.location.pathname}?ref=${code}`
 
 export const savedMember = () => store.get(MEMBER_KEY)
+
+// Reads ?verified=1|0 left by the email confirmation link, then tidies it away.
+export function captureVerified() {
+  const params = new URLSearchParams(window.location.search)
+  const value = params.get('verified')
+  if (value === null) return null
+  params.delete('verified')
+  const query = params.toString()
+  window.history.replaceState(null, '', `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`)
+  return value === '1'
+}
 export const forgetMember = () => store.set(MEMBER_KEY, null)
 
 async function request(path, options = {}) {
@@ -60,13 +71,14 @@ async function request(path, options = {}) {
   return data
 }
 
-export async function joinWaitlist(email, source) {
+// `trap` carries the bot checks: honeypot value and time spent before submitting.
+export async function joinWaitlist(email, source, trap = {}) {
   let member
   if (DEMO) {
     await new Promise((r) => setTimeout(r, 600))
-    member = { code: Math.random().toString(36).slice(2, 10), referrals: 0, position: null, total: null, demo: true }
+    member = { code: Math.random().toString(36).slice(2, 10), referrals: 0, position: null, total: null, verified: true, demo: true }
   } else {
-    member = await request('/join', { method: 'POST', body: JSON.stringify({ email, source, ref: store.get(REF_KEY) }) })
+    member = await request('/join', { method: 'POST', body: JSON.stringify({ email, source, ref: store.get(REF_KEY), ...trap }) })
   }
   store.set(MEMBER_KEY, member)
   return member

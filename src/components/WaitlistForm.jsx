@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { isValidEmail, joinWaitlist } from '../waitlist.js'
 import { PlaneIcon } from './Icons.jsx'
 
@@ -6,6 +6,8 @@ export default function WaitlistForm({ placeholder, buttonLabel, source, member,
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState('idle') // idle | sending | error
   const [error, setError] = useState('')
+  const [trap, setTrap] = useState('')
+  const mountedAt = useRef(Date.now())
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -17,7 +19,7 @@ export default function WaitlistForm({ placeholder, buttonLabel, source, member,
     }
     setStatus('sending')
     try {
-      onJoined(await joinWaitlist(value, source))
+      onJoined(await joinWaitlist(value, source, { website: trap, elapsed: Date.now() - mountedAt.current }))
       setStatus('idle')
     } catch (err) {
       setStatus('error')
@@ -34,7 +36,9 @@ export default function WaitlistForm({ placeholder, buttonLabel, source, member,
             You&rsquo;re on the list{member.position ? <>, #{member.position.toLocaleString('en-US')} in line</> : ''}.
           </p>
           <p className="success-body">
-            Invite friends with your personal link to move up the line and unlock exclusive rewards.
+            {member.verified === false
+              ? 'Check your inbox and confirm your email to lock in your spot. Then invite friends to move up the line.'
+              : 'Invite friends with your personal link to move up the line and unlock exclusive rewards.'}
           </p>
           <a className="link-btn" href="#rewards">Get your invite link ↓</a>
         </div>
@@ -58,6 +62,17 @@ export default function WaitlistForm({ placeholder, buttonLabel, source, member,
         }}
         aria-invalid={status === 'error'}
         aria-describedby={status === 'error' ? `err-${source}` : undefined}
+      />
+      {/* Honeypot: invisible to people, irresistible to bots. */}
+      <input
+        className="hp"
+        type="text"
+        name="website"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        value={trap}
+        onChange={(e) => setTrap(e.target.value)}
       />
       <button type="submit" className="btn-primary" disabled={status === 'sending'}>
         {status === 'sending' ? 'Throwing…' : buttonLabel}

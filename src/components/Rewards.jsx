@@ -57,6 +57,11 @@ function Dashboard({ member }) {
 
   return (
     <div className="dash">
+      {member.verified === false && (
+        <p className="verify-note">
+          <strong>Confirm your email.</strong> We sent a link to your inbox. Your spot, and your friend&rsquo;s boost if someone invited you, count once you confirm.
+        </p>
+      )}
       {member.demo && (
         <p className="demo-note">Demo mode: remove <code>VITE_API_URL=demo</code> to track real invites and places in line.</p>
       )}
